@@ -1,0 +1,72 @@
+[package]
+name = "leptos-ssr"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+leptos = { version = "0.7.0" }
+leptos_router = { version = "0.7.0" }
+axum = { version = "0.7", optional = true }
+console_error_panic_hook = { version = "0.1", optional = true}
+leptos_axum = { version = "0.7.0", optional = true }
+leptos_meta = { version = "0.7.0" }
+tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
+wasm-bindgen = { version = "=0.2.100", optional = true }
+stylance = "0.6.0"
+sqlx = { version = "0.8.5", optional = true, features = ["chrono", "runtime-tokio-rustls", "sqlite"] }
+anyhow = "1.0.98"
+serde = { version = "1.0.219", features = ["derive"] }
+futures = "0.3.31"
+
+[features]
+default = ["hydrate", "ssr"]
+hydrate = [
+    "leptos/hydrate",
+    "dep:console_error_panic_hook",
+    "dep:wasm-bindgen",
+]
+ssr = [
+    "dep:sqlx",
+    "dep:axum",
+    "dep:tokio",
+    "dep:leptos_axum",
+    "leptos/ssr",
+    "leptos_meta/ssr",
+    "leptos_router/ssr",
+]
+
+[profile.wasm-release]
+inherits = "release"
+opt-level = 'z'
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[package.metadata.leptos]
+output-name = "leptos-ssr"
+site-root = "target/site"
+site-pkg-dir = "pkg"
+style-file = "style/main.scss"
+assets-dir = "public"
+site-addr = "127.0.0.1:3000"
+reload-port = 3001
+
+end2end-cmd = "npx playwright test"
+end2end-dir = "end2end"
+browserquery = "defaults"
+
+env = "DEV"
+
+bin-features = ["ssr"]
+bin-default-features = false
+lib-features = ["hydrate"]
+lib-default-features = false
+lib-profile-release = "wasm-release"
+
+
+[package.metadata.stylance]
+output_file = "./style/main.scss"
+folders = ["./src/", "./style/"]
