@@ -1,0 +1,2 @@
+[env]
+DB_URL = "/git/rust/rust-web/leptos-ssr/db/todos.db"
